@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('https://th.bing.com/th/id/OIP.xYEW4bjrO3sT_04SUgLLmAHaE8?rs=1&pid=ImgDetMain') no-repeat center center/cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            display: none;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            margin-bottom: 15px;
+        }
+        input, textarea, .button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        input, textarea {
+            background: white;
+            color: black;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .job-card {
+            background: white;
+            color: black;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sign Up Page -->
+    <div id="signUpPage" class="container">
+        <h1>Sign Up</h1>
+        <input type="text" id="signUpName" placeholder="Full Name" required><br>
+        <input type="email" id="signUpEmail" placeholder="Email" required><br>
+        <input type="password" id="signUpPassword" placeholder="Password" required><br>
+        <button class="button" onclick="signUp()">Sign Up</button>
+        <p>Already have an account? <a href="#" onclick="showSection('loginPage')">Log In</a></p>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="container">
+        <h1>Login</h1>
+        <input type="email" id="loginEmail" placeholder="Email" required><br>
+        <input type="password" id="loginPassword" placeholder="Password" required><br>
+        <button class="button" onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showSection('signUpPage')">Sign Up</a></p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="container">
+        <h1>Dashboard</h1>
+        <div class="nav-buttons">
+        <button class="button" onclick="showSection('browseJobs')">Browse Jobs</button>
+        <button class="button" onclick="showSection('postJob')">Post a Job</button>
+        <button class="button" onclick="showSection('submitResume')">Submit Resume</button>
+        <button class="button" onclick="showSection('careerGuidance')">Career Guidance</button>
+        <button class="button" onclick="showSection('topTrendingJobs')">Trending Jobs</button>
+        <button class="button" onclick="showSection('myApplications')">My Applications</button>
+        <button class="button" onclick="showSection('personalInfo')">Personal Info</button>
+        <button class="button" onclick="logout()">Logout</button>
+        </div>
+    </div>
+ <!-- Submit Resume -->
+ <div id="submitResume" class="container">
+    <h1>Submit Your Resume</h1>
+    <input type="file" id="resumeUpload" accept=".pdf,.doc,.docx" required><br>
+    <button class="button" onclick="uploadResume()">Upload</button>
+    <p id="resumeStatus">No resume uploaded.</p>
+    <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+</div>
+    <!-- Browse Jobs -->
+    <div id="browseJobs" class="container">
+        <h1>Available Jobs</h1>
+        <div id="job-list"></div>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+     <!-- Dashboard -->
+    <div id="dashboard" class="container">
+        <h1>Dashboard</h1>
+        <div class="nav-buttons">
+            <button class="button" onclick="showSection('personalInfo')">Personal Info</button>
+            <button class="button" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Personal Information Dashboard -->
+    <div id="personalInfo" class="container">
+        <h1>Personal Information</h1>
+        <input type="text" id="fullName" placeholder="Full Name" required><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="tel" id="phone" placeholder="Phone Number" required><br>
+        <textarea id="address" placeholder="Address" required></textarea><br>
+        <button class="button" onclick="savePersonalInfo()">Save</button>
+        <h3>Saved Information</h3>
+        <p id="savedInfo">No information saved.</p>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.container').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function savePersonalInfo() {
+            let userInfo = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+            localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Save data in browser storage
+            displaySavedInfo();
+            alert("Personal information saved!");
+        }
+
+        function displaySavedInfo() {
+            let savedData = localStorage.getItem("userInfo");
+            if (savedData) {
+                let userInfo = JSON.parse(savedData);
+                document.getElementById('savedInfo').innerHTML = `
+                    <strong>Name:</strong> ${userInfo.fullName}<br>
+                    <strong>Email:</strong> ${userInfo.email}<br>
+                    <strong>Phone:</strong> ${userInfo.phone}<br>
+                    <strong>Address:</strong> ${userInfo.address}
+                `;
+                document.getElementById('fullName').value = userInfo.fullName;
+                document.getElementById('email').value = userInfo.email;
+                document.getElementById('phone').value = userInfo.phone;
+                document.getElementById('address').value = userInfo.address;
+            }
+        }
+
+        function logout() {
+            alert("Logged out successfully!");
+            showSection('dashboard');
+        }
+
+        window.onload = function () {
+            displaySavedInfo(); // Load saved personal info when the page loads
+            showSection('dashboard');
+        };
+    </script>
+
+</body>
+</html>
+
+    <!-- Post a Job -->
+    <div id="postJob" class="container">
+        <h1>Post a Job</h1>
+        <form onsubmit="addJob(event)">
+            <input type="text" id="jobTitle" placeholder="Job Title" required><br>
+            <input type="text" id="jobCompany" placeholder="Company Name" required><br>
+            <input type="text" id="jobLocation" placeholder="Location" required><br>
+            <textarea id="jobDescription" placeholder="Job Description" required></textarea><br>
+            <button type="submit" class="button">Post Job</button>
+        </form>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+    <!-- Career Guidance -->
+    <div id="careerGuidance" class="container">
+        <h1>Career Guidance</h1>
+        <h3>Resume Tips</h3>
+        <ul>
+            <li>Keep It Concise – Aim for one page unless you have extensive experience.</li>
+            <li> a Professional Format– Stick to clean fonts (Arial, Calibri) and proper spacing.</li>
+            <li>Tailor for Each Job – Customize your resume based on the job description using relevant keywords.</li>
+            <li>Use a Reverse-Chronological Format– List recent experiences first.</li>
+            <li>Quantify Achievements – Use numbers to highlight impact (e.g., "Improved data processing time by 30%").</li>
+            <li>Proofread & Use Grammarly – Avoid typos and grammatical errors.</li>
+            <li>Save as PDF – Unless the employer requests a different format.</li>
+        </ul>
+        <h3>Interview Preparation</h3>
+        <ul>
+            <li>Research & Preparation</li>
+            <li>Resume & Portfolio</li>
+            <li>Behavioral Interview Prep</li>
+            <li>Technical Interview Prep</li>
+            <li>Hands-on Practice</li>
+            <li>After the Interview</li>
+        </ul>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+
+    <!-- Trending Jobs -->
+    <div id="topTrendingJobs" class="container">
+        <h1>Top Trending Job Categories</h1>
+        <button class="button" onclick="showJobs('AI/ML')">AI/ML</button>
+        <button class="button" onclick="showJobs('Cybersecurity')">Cybersecurity</button>
+        <button class="button" onclick="showJobs('Data Analytics')">Data Analytics</button>
+        <button class="button" onclick="showJobs('Cloud Computing')">Cloud Computing</button>
+        <button class="button" onclick="showJobs('Software Development')">Software Development</button>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+
+<!-- Job Listings -->
+<div id="jobList" class="container"></div>
+
+<script>
+    function showSection(sectionId) {
+        document.querySelectorAll('.container, .dashboard').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(sectionId).style.display = 'block';
+    }
+
+    function signUp() {
+        alert("Sign up successful! Please log in.");
+        showSection('loginPage');
+    }
+
+    function login() {
+        let email = document.getElementById('loginEmail').value;
+        let password = document.getElementById('loginPassword').value;
+        if (email && password) {
+            showSection('dashboard');
+        } else {
+            alert("Please enter valid credentials.");
+        }
+    }
+
+    function logout() {
+        alert("Logged out successfully!");
+        showSection('loginPage');
+    }
+
+    function addJob(event) {
+        event.preventDefault();
+        let title = document.getElementById('jobTitle').value;
+        let company = document.getElementById('jobCompany').value;
+        let location = document.getElementById('jobLocation').value;
+        let description = document.getElementById('jobDescription').value;
+        let jobCard = document.createElement('div');
+        jobCard.classList.add('job-card');
+        jobCard.innerHTML = `<strong>${title}</strong> - ${company} (${location}) <br> ${description}`;
+        document.getElementById('job-list').appendChild(jobCard);
+        showSection('browseJobs');
+    }
+
+    function showJobs(category) {
+        let jobList = {
+            'AI/ML': ['Machine Learning Engineer', 'AI Research Scientist'],
+            'Cybersecurity': ['Security Analyst', 'Penetration Tester'],
+            'Data Analytics': ['Data Analyst', 'Business Intelligence Analyst'],
+            'Cloud Computing': ['Cloud Engineer', 'DevOps Engineer'],
+            'Software Development': ['Full Stack Developer', 'Mobile App Developer']
+        };
+        let content = `<h1>${category} Jobs</h1><ul class='job-list'>`;
+        jobList[category].forEach(job => content += `<li>${job}</li>`);
+        content += `</ul><button class='button' onclick="showSection('topTrendingJobs')">⬅ Back</button>`;
+        document.getElementById('jobList').innerHTML = content;
+        showSection('jobList');
+    }
+
+    showSection('signInPage');
+</script>
+
+</body>
+</html>  <!-- My Applications -->
+<div id="myApplications" class="container">
+    <h1>My Applications</h1>
+    <div id="applied-jobs"></div>
+    <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+</div>
+
+<!-- Resume Upload -->
+<div id="resumeUpload" class="container">
+    <h1>Upload Resume</h1>
+    <input type="file" id="resumeFile"><br>
+    <button class="button" onclick="saveResume()">Upload</button>
+    <h3>Uploaded Resume:</h3>
+    <p id="uploadedResume">No resume uploaded.</p>
+    <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+</div>
+
+<script>
+    function showSection(sectionId) {
+        document.querySelectorAll('.container').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(sectionId).style.display = 'block';
+    }
+
+    function savePersonalInfo() {
+        let userInfo = {
+            fullName: document.getElementById('fullName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value
+        };
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        displaySavedInfo();
+        alert("Personal information saved!");
+    }
+
+    function displaySavedInfo() {
+        let savedData = localStorage.getItem("userInfo");
+        if (savedData) {
+            let userInfo = JSON.parse(savedData);
+            document.getElementById('savedInfo').innerHTML = `
+                <strong>Name:</strong> ${userInfo.fullName}<br>
+                <strong>Email:</strong> ${userInfo.email}<br>
+                <strong>Phone:</strong> ${userInfo.phone}<br>
+                <strong>Address:</strong> ${userInfo.address}
+            `;
+        }
+    }
+
+    function addJob(event) {
+        event.preventDefault();
+        let job = {
+            title: document.getElementById('jobTitle').value,
+            company: document.getElementById('jobCompany').value,
+            location: document.getElementById('jobLocation').value,
+            description: document.getElementById('jobDescription').value
+        };
+        let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+        jobs.push(job);
+        localStorage.setItem("jobs", JSON.stringify(jobs));
+        displayJobs();
+        showSection('browseJobs');
+    }
+
+    function displayJobs() {
+        let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+        let jobListDiv = document.getElementById('job-list');
+        jobListDiv.innerHTML = "";
+        jobs.forEach((job, index) => {
+            jobListDiv.innerHTML += `<div class='job-card'>
+                <strong>${job.title}</strong> - ${job.company} (${job.location})<br>
+                ${job.description}<br>
+                <button class='button' onclick='applyJob(${index})'>Apply</button>
+            </div>`;
+        });
+    }
+
+    function applyJob(index) {
+        let jobs = JSON.parse(localStorage.getItem("jobs"));
+        let appliedJobs = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+        appliedJobs.push(jobs[index]);
+        localStorage.setItem("appliedJobs", JSON.stringify(appliedJobs));
+        alert("Application submitted!");
+    }
+
+    window.onload = function () {
+        displayJobs();
+        displaySavedInfo();
+        showSection('dashboard');
+    };
+</script>
+
+</body>
+</html>
+    <!-- My Applications -->
+    <div id="myApplications" class="container">
+        <h1>My Applications</h1>
+        <div id="applied-jobs"></div>
+        <button class="button" onclick="showSection('dashboard')">⬅ Back</button>
+    </div>
+
+    <script>
+        let jobs = [];
+        let appliedJobs = [];
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.container').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        function signUp() {
+            alert("Sign up successful! Please log in.");
+            showSection('loginPage');
+        }
+
+        function login() {
+            let email = document.getElementById('loginEmail').value;
+            let password = document.getElementById('loginPassword').value;
+            if (email && password) {
+                showSection('dashboard');
+            } else {
+                alert("Please enter valid credentials.");
+            }
+        }
+
+        function logout() {
+            alert("Logged out successfully!");
+            showSection('loginPage');
+        }
+
+        function addJob(event) {
+            event.preventDefault();
+            let title = document.getElementById('jobTitle').value;
+            let company = document.getElementById('jobCompany').value;
+            let location = document.getElementById('jobLocation').value;
+            let description = document.getElementById('jobDescription').value;
+
+            let job = { title, company, location, description };
+            jobs.push(job);
+            displayJobs();
+            showSection('browseJobs');
+        }
+
+        function displayJobs() {
+            let jobList = document.getElementById('job-list');
+            jobList.innerHTML = '';
+            jobs.forEach((job, index) => {
+                let jobCard = document.createElement('div');
+                jobCard.classList.add('job-card');
+                jobCard.innerHTML = `
+                    <strong>${job.title}</strong> - ${job.company} (${job.location})<br>${job.description}
+                    <br><button class='button' onclick="applyJob(${index})">Apply</button>`;
+                jobList.appendChild(jobCard);
+            });
+        }
+
+        function applyJob(index) {
+            let job = jobs[index];
+            appliedJobs.push(job);
+            displayAppliedJobs();
+            alert("Application Submitted Successfully!");
+            showSection('myApplications');
+        }
+
+        function displayAppliedJobs() {
+            let appliedJobList = document.getElementById('applied-jobs');
+            appliedJobList.innerHTML = '';
+            appliedJobs.forEach(job => {
+                let appliedJobCard = document.createElement('div');
+                appliedJobCard.classList.add('job-card');
+                appliedJobCard.innerHTML = `<strong>${job.title}</strong> - ${job.company} (${job.location})<br>Application Submitted!`;
+                appliedJobList.appendChild(appliedJobCard);
+            });
+        }
+
+        showSection('signUpPage');
+        <!-- Job Listings -->
+    
+    </script>
+
+</body>
+</html>
